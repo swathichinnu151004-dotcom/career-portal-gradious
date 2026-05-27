@@ -65,7 +65,8 @@ function RecruiterSignup() {
     };
 
     loadInvite();
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, API_BASE_URL]); // ✅ Added API_BASE_URL dependency here to satisfy the React compiler
 
   const handleChange = (e) => {
     setFormData({
@@ -136,20 +137,20 @@ function RecruiterSignup() {
 
     try {
       setLoading(true);
-const response = await fetch(`${API_BASE_URL}/auth/register-recruiter`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    token,
-    name: name.trim(),
-    phone: phone.trim(),
-    company_name: company_name.trim(),
-    location: location.trim(),
-    password: password.trim(),
-  }),
-});
+      const response = await fetch(`${API_BASE_URL}/auth/register-recruiter`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          name: name.trim(),
+          phone: phone.trim(),
+          company_name: company_name.trim(),
+          location: location.trim(),
+          password: password.trim(),
+        }),
+      });
       const data = await response.json();
 
       if (!response.ok) {
