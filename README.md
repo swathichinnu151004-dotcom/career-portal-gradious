@@ -165,7 +165,7 @@ I developed the complete project including:
 
 ## 🔗 GitHub Repository
 
-👉 https://github.com/swathichinnu151004-dotcom/gradious-career-portal-final
+👉 https://github.com/swathichinnu151004-dotcom/gradious-career-portal-project
 
 ---
 
