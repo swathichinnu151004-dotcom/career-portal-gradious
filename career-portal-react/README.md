@@ -24,3 +24,4 @@ Use `src/utils/logger.js` instead of scattered `console.*` calls so messages are
 ## CRA reference
 
 Standard Create React App topics (testing, eject, deployment) are documented at [https://create-react-app.dev/](https://create-react-app.dev/).
+Updated by Swathi
