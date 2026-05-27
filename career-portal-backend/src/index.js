@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const logger = require("./utils/logger");
 const { ensureNotificationsTable } = require("./utils/ensureNotificationsTable");
+const { ensureJobsOpeningsColumn } = require("./utils/ensureJobsOpeningsColumn");
 const db = require("./config/connectDB");
 
 const app = express();
@@ -100,6 +101,21 @@ const PORT = Number(process.env.PORT) || 5000;
 /** Listen on all interfaces so phones and other devices on the LAN can reach the API. */
 const LISTEN_HOST = process.env.LISTEN_HOST || "0.0.0.0";
 
+async function logJobsOpeningsSchemaHealth() {
+  try {
+    await db.query("SELECT openings FROM jobs LIMIT 1");
+    logger.info("DB schema check: jobs.openings column found");
+  } catch (e) {
+    if (e?.code === "ER_BAD_FIELD_ERROR") {
+      logger.warn(
+        "DB schema warning: jobs.openings column is missing. Run career-portal-backend/database/add_openings_to_jobs.sql"
+      );
+      return;
+    }
+    logger.warn("Could not verify jobs.openings schema:", e.message || e);
+  }
+}
+
 async function startServer() {
   try {
     await ensureNotificationsTable();
@@ -107,6 +123,15 @@ async function startServer() {
     logger.error(
       "Failed to prepare notifications table (notifications may not work):",
       e
+    );
+  }
+
+  try {
+    await ensureJobsOpeningsColumn();
+  } catch (e) {
+    logger.error(
+      "Failed to prepare jobs.openings column (job openings features may fail):",
+      e.message || e
     );
   }
 
@@ -121,6 +146,8 @@ async function startServer() {
       e.message || e
     );
   }
+
+  await logJobsOpeningsSchemaHealth();
 
   app.listen(PORT, LISTEN_HOST, () => {
     const publicHint = String(process.env.FRONTEND_URL || "").trim();

@@ -35,6 +35,18 @@ router.delete(
 
 // Dashboard
 router.get("/dashboard-summary", verifyToken, roleMiddleware("admin"), adminController.getDashboardSummary);
+router.get(
+  "/job-application-stats",
+  verifyToken,
+  roleMiddleware("admin"),
+  adminController.getJobApplicationStats
+);
+router.get(
+  "/user-application-stats",
+  verifyToken,
+  roleMiddleware("admin"),
+  adminController.getUserApplicationStats
+);
 
 // Users
 router.get("/users", verifyToken, roleMiddleware("admin"), adminController.getAllUsers);

@@ -23,6 +23,14 @@ function resumeFileUrl(resume) {
   return `${getServerOrigin()}/${path}`;
 }
 
+function applicantKey(app) {
+  const email = String(app?.email || "").trim().toLowerCase();
+  if (email) return `email:${email}`;
+  const phone = String(app?.phone || "").trim();
+  if (phone) return `phone:${phone}`;
+  return `name:${String(app?.applicant_name || "").trim().toLowerCase()}`;
+}
+
 function ViewApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,6 +146,28 @@ function ViewApplications() {
     });
   }, [applications, search]);
 
+  const applicantStatsMap = useMemo(() => {
+    const stats = new Map();
+    for (const app of applications) {
+      const key = applicantKey(app);
+      if (!stats.has(key)) {
+        stats.set(key, {
+          appliedJobs: 0,
+          pendingJobs: 0,
+          shortlistedJobs: 0,
+          rejectedJobs: 0,
+        });
+      }
+      const item = stats.get(key);
+      item.appliedJobs += 1;
+      const status = String(app?.status || "").trim().toLowerCase();
+      if (status === "applied" || status === "pending") item.pendingJobs += 1;
+      if (status === "shortlisted") item.shortlistedJobs += 1;
+      if (status === "rejected") item.rejectedJobs += 1;
+    }
+    return stats;
+  }, [applications]);
+
   const totalApplications = applications.length;
   const appliedCount = applications.filter(
     (app) => app.status?.toLowerCase() === "applied"
@@ -210,6 +240,7 @@ function ViewApplications() {
                   <tr>
                     <th>Applicant Name</th>
                     <th>Job Title</th>
+                    <th>Applied Jobs</th>
                     <th>Resume</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -222,12 +253,23 @@ function ViewApplications() {
                     const isShortlisted = status === "shortlisted";
                     const isRejected = status === "rejected";
                     const isUpdating = updatingId === app.id;
+                    const stats = applicantStatsMap.get(applicantKey(app)) || {
+                      appliedJobs: 0,
+                      pendingJobs: 0,
+                      shortlistedJobs: 0,
+                      rejectedJobs: 0,
+                    };
 
                     return (
                       <tr key={app.id}>
                         <td className="applicant-name-cell">{app.applicant_name}</td>
 
                         <td>{app.job_title}</td>
+                        <td>
+                          <span className="applicant-stat-chip stat-chip-applied">
+                            {stats.appliedJobs}
+                          </span>
+                        </td>
 
                         <td>
                           {app.resume ? (
@@ -325,6 +367,18 @@ function ViewApplications() {
                   >
                     {selectedApp.status}
                   </span>
+                </DetailDrawerField>
+                <DetailDrawerField label="Total applied jobs">
+                  {applicantStatsMap.get(applicantKey(selectedApp))?.appliedJobs ?? 0}
+                </DetailDrawerField>
+                <DetailDrawerField label="Pending jobs">
+                  {applicantStatsMap.get(applicantKey(selectedApp))?.pendingJobs ?? 0}
+                </DetailDrawerField>
+                <DetailDrawerField label="Shortlisted jobs">
+                  {applicantStatsMap.get(applicantKey(selectedApp))?.shortlistedJobs ?? 0}
+                </DetailDrawerField>
+                <DetailDrawerField label="Rejected jobs">
+                  {applicantStatsMap.get(applicantKey(selectedApp))?.rejectedJobs ?? 0}
                 </DetailDrawerField>
                 <DetailDrawerField label="Applied date">
                   {selectedApp.applied_date

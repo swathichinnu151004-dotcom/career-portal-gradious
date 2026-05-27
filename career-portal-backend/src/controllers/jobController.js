@@ -52,7 +52,7 @@ exports.getAllJobs = async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      `SELECT j.id, j.job_title, j.department, j.location, j.experience, j.description,
+      `SELECT j.id, j.job_title, j.department, j.location, j.experience, j.openings, j.description,
               j.recruiter_id, j.posted_date, j.status
        FROM jobs j
        WHERE NOT EXISTS (
@@ -65,6 +65,12 @@ exports.getAllJobs = async (req, res) => {
 
     res.json(rows);
   } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") {
+      return res.status(500).json({
+        message:
+          "Database migration missing: jobs.openings column is required.",
+      });
+    }
     logger.error("getAllJobs failed:", error);
     res.status(500).json({ message: "Error fetching jobs" });
   }

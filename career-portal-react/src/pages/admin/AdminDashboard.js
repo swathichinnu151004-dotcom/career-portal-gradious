@@ -11,7 +11,10 @@ import {
   Legend,
 } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
-import { getAdminDashboardSummary } from "../../services/adminService";
+import {
+  getAdminDashboardSummary,
+  getUserApplicationStats,
+} from "../../services/adminService";
 import {
   chartFontFamily,
   niceAxisMax,
@@ -37,9 +40,11 @@ function AdminDashboard() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [userApplicationStats, setUserApplicationStats] = useState([]);
 
   useEffect(() => {
     loadDashboardSummary();
+    loadUserApplicationStats();
   }, []);
 
   const loadDashboardSummary = async () => {
@@ -59,6 +64,16 @@ function AdminDashboard() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUserApplicationStats = async () => {
+    try {
+      const response = await getUserApplicationStats();
+      setUserApplicationStats(Array.isArray(response?.data) ? response.data : []);
+    } catch (error) {
+      console.error("Error loading user application stats:", error);
+      setUserApplicationStats([]);
     }
   };
 
@@ -257,6 +272,57 @@ function AdminDashboard() {
                 </div>
               </div>
             </div>
+
+            <section className="admin-job-stats-panel dash-chart-panel">
+              <div className="dash-chart-head">
+                <h3>User-wise application insights</h3>
+                <p>
+                  Each user's applied jobs, selected (shortlisted), and rejected counts.
+                </p>
+              </div>
+              {userApplicationStats.length === 0 ? (
+                <p className="admin-job-stats-empty">
+                  No user application stats available.
+                </p>
+              ) : (
+                <div className="admin-job-stats-table-wrap">
+                  <table className="admin-job-stats-table">
+                    <thead>
+                      <tr>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Applied Jobs</th>
+                        <th>Selected</th>
+                        <th>Rejected</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userApplicationStats.map((item) => (
+                        <tr key={item.user_id}>
+                          <td>{item.user_name}</td>
+                          <td>{item.email}</td>
+                          <td>
+                            <span className="admin-stat-pill pill-applied">
+                              {item.applied_jobs}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="admin-stat-pill pill-selected">
+                              {item.shortlisted_jobs}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="admin-stat-pill pill-rejected">
+                              {item.rejected_jobs}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
           </>
         )}
       </div>

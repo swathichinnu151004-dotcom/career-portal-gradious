@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "react-toastify";
 import Layout from "../../components/common/Layout";
@@ -22,7 +22,10 @@ function ManageRecruiterJobs() {
   const token = localStorage.getItem("token");
 
   const [jobs, setJobs] = useState([]);
+  const [jobTitleSummary, setJobTitleSummary] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedJobTitle, setSelectedJobTitle] = useState("");
+  const tableSectionRef = useRef(null);
 
   const [viewJob, setViewJob] = useState(null);
   const [updateJob, setUpdateJob] = useState(null);
@@ -95,7 +98,7 @@ function ManageRecruiterJobs() {
     }
   };
 
-  const filteredJobs = jobs.filter((job) => {
+  const searchedJobs = jobs.filter((job) => {
     if (!job) return false;
     const text = `${job.job_title || ""} ${job.department || ""} ${
       job.status || ""
@@ -103,16 +106,116 @@ function ManageRecruiterJobs() {
     return text.includes(search.toLowerCase());
   });
 
+  const filteredJobs = searchedJobs.filter((job) => {
+    if (!selectedJobTitle) return true;
+    return (
+      String(job?.job_title || "").trim().toLowerCase() ===
+      selectedJobTitle.trim().toLowerCase()
+    );
+  });
+
+  const fallbackTitleSummary = useMemo(() => {
+    const grouped = new Map();
+
+    for (const job of searchedJobs) {
+      const title = String(job?.job_title || "").trim() || "Untitled Job";
+      const key = title.toLowerCase();
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          job_title: title,
+          total_jobs: 0,
+          active_openings: 0,
+        });
+      }
+
+      const item = grouped.get(key);
+      item.total_jobs += 1;
+
+      if (String(job?.status || "").toUpperCase() === "ACTIVE") {
+        const openings = Number.parseInt(job?.openings, 10);
+        item.active_openings +=
+          Number.isFinite(openings) && openings > 0 ? openings : 1;
+      }
+    }
+
+    return Array.from(grouped.values()).sort(
+      (a, b) =>
+        Number(b.total_jobs || 0) - Number(a.total_jobs || 0) ||
+        String(a.job_title || "").localeCompare(String(b.job_title || ""))
+    );
+  }, [searchedJobs]);
+
+  const effectiveTitleSummary =
+    jobTitleSummary.length > 0 ? jobTitleSummary : fallbackTitleSummary;
+
+  useEffect(() => {
+    if (!selectedJobTitle) return;
+    const exists = effectiveTitleSummary.some(
+      (item) =>
+        String(item?.job_title || "").trim().toLowerCase() ===
+        selectedJobTitle.trim().toLowerCase()
+    );
+    if (!exists) setSelectedJobTitle("");
+  }, [effectiveTitleSummary, selectedJobTitle]);
+
+  useEffect(() => {
+    if (!selectedJobTitle) return;
+    tableSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [selectedJobTitle]);
+
+  const loadJobTitleSummary = useCallback(
+    async (searchTerm = "") => {
+      try {
+        const q = String(searchTerm || "").trim();
+        const url = q
+          ? `${getApiBaseUrl()}/recruiter/jobs/title-summary?search=${encodeURIComponent(q)}`
+          : `${getApiBaseUrl()}/recruiter/jobs/title-summary`;
+
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json().catch(() => []);
+        if (!res.ok) {
+          setJobTitleSummary([]);
+          return;
+        }
+        setJobTitleSummary(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Load job title summary error:", err);
+        setJobTitleSummary([]);
+      }
+    },
+    [token]
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadJobTitleSummary(search);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [search, loadJobTitleSummary]);
+
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     if (!updateJob) return;
 
     try {
+      const openingsValue = Number.parseInt(updateJob.openings, 10);
+      if (!Number.isFinite(openingsValue) || openingsValue < 1) {
+        showToast("Openings must be a whole number greater than 0", "error");
+        return;
+      }
+
       const payload = {
         job_title: updateJob.job_title?.trim() || "",
         department: updateJob.department?.trim() || "",
         location: updateJob.location?.trim() || "",
         experience: updateJob.experience?.trim() || "",
+        openings: openingsValue,
         status: updateJob.status?.trim() || "ACTIVE",
         description: updateJob.description?.trim() || "",
       };
@@ -196,12 +299,80 @@ function ManageRecruiterJobs() {
           />
         </div>
 
-        <div className="table-wrapper">
+        <div className="job-title-summary">
+          <div className="job-title-summary-head">
+            <h3>Jobs by title</h3>
+            <p>
+              Total postings and currently active openings for each job title
+            </p>
+          </div>
+
+          {effectiveTitleSummary.length === 0 ? (
+            <p className="job-title-empty">No job title summary available.</p>
+          ) : (
+            <div className="job-title-grid">
+              {effectiveTitleSummary.map((item) => {
+                const isSelected =
+                  String(item?.job_title || "").trim().toLowerCase() ===
+                  selectedJobTitle.trim().toLowerCase();
+                return (
+                <div
+                  key={item.job_title}
+                  className={`job-title-card ${isSelected ? "active" : ""}`}
+                  onClick={() =>
+                    setSelectedJobTitle((prev) =>
+                      String(prev || "").trim().toLowerCase() ===
+                      String(item?.job_title || "").trim().toLowerCase()
+                        ? ""
+                        : item.job_title
+                    )
+                  }
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedJobTitle((prev) =>
+                        String(prev || "").trim().toLowerCase() ===
+                        String(item?.job_title || "").trim().toLowerCase()
+                          ? ""
+                          : item.job_title
+                      );
+                    }
+                  }}
+                  title="Click to filter table by this job title"
+                >
+                  <h4>{item.job_title}</h4>
+                  <div className="job-title-metrics">
+                    <span>{item.total_jobs} job(s)</span>
+                    <span>{item.active_openings} opening(s)</span>
+                  </div>
+                </div>
+                );
+              })}
+            </div>
+          )}
+          {selectedJobTitle ? (
+            <div className="selected-title-filter">
+              Showing table rows for: <strong>{selectedJobTitle}</strong>
+              <button
+                type="button"
+                className="clear-title-filter"
+                onClick={() => setSelectedJobTitle("")}
+              >
+                Clear
+              </button>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="table-wrapper" ref={tableSectionRef}>
           <table className="jobs-table">
             <thead>
               <tr>
                 <th>Job Title</th>
                 <th>Department</th>
+                <th>Openings</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -210,7 +381,7 @@ function ManageRecruiterJobs() {
             <tbody>
               {filteredJobs.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="no-data">
+                  <td colSpan="5" className="no-data">
                     No jobs found
                   </td>
                 </tr>
@@ -226,6 +397,7 @@ function ManageRecruiterJobs() {
                     <tr key={rowKey}>
                       <td>{job.job_title || "-"}</td>
                       <td>{job.department || "-"}</td>
+                      <td>{job.openings || 1}</td>
                       <td>
                         <span
                           className={`status ${
@@ -245,7 +417,12 @@ function ManageRecruiterJobs() {
                           <TableIconActionButton
                             variant="update"
                             tooltip="Edit job"
-                            onClick={() => setUpdateJob({ ...job })}
+                            onClick={() =>
+                              setUpdateJob({
+                                ...job,
+                                openings: job.openings || 1,
+                              })
+                            }
                           />
                           <TableIconActionButton
                             variant="delete"
@@ -283,6 +460,9 @@ function ManageRecruiterJobs() {
             </DetailDrawerField>
             <DetailDrawerField label="Experience">
               {viewJob.experience || "-"}
+            </DetailDrawerField>
+            <DetailDrawerField label="Openings">
+              {viewJob.openings || 1}
             </DetailDrawerField>
             <DetailDrawerField label="Status">
               {viewJob.status || "-"}
@@ -399,7 +579,22 @@ function ManageRecruiterJobs() {
                   </select>
                 </div>
 
-                <div className="form-group empty-space"></div>
+                <div className="form-group">
+                  <label>Openings</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={updateJob.openings || ""}
+                    onChange={(e) =>
+                      setUpdateJob({
+                        ...updateJob,
+                        openings: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
               </div>
 
               <div className="form-row single">

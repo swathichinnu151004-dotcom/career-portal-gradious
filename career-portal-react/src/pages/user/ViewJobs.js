@@ -135,6 +135,7 @@ function ViewJobs() {
                     <th>Department</th>
                     <th>Location</th>
                     <th>Experience</th>
+                    <th>Openings</th>
                     <th>Apply</th>
                   </tr>
                 </thead>
@@ -145,6 +146,7 @@ function ViewJobs() {
                       <td>{job.department}</td>
                       <td>{job.location}</td>
                       <td>{job.experience}</td>
+                      <td>{Number.parseInt(job.openings, 10) || 1}</td>
                       <td>
                         <button
                           className="apply-btn"

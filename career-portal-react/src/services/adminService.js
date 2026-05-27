@@ -3,6 +3,12 @@ import API from "./api";
 export const getAdminDashboardSummary = () => {
   return API.get("/admin/dashboard-summary");
 };
+export const getJobApplicationStats = () => {
+  return API.get("/admin/job-application-stats");
+};
+export const getUserApplicationStats = () => {
+  return API.get("/admin/user-application-stats");
+};
 export const getRecentJobs = () => {
   return API.get("/admin/recent-jobs");
 };

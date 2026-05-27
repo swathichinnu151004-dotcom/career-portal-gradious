@@ -11,6 +11,22 @@ function recruiterIdFromRequest(req) {
   const n = Number.parseInt(String(raw), 10);
   return Number.isFinite(n) ? n : null;
 }
+
+function parseOpenings(value) {
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+async function jobsTableHasOpeningsColumn() {
+  try {
+    await db.query("SELECT openings FROM jobs LIMIT 1");
+    return true;
+  } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") return false;
+    logger.warn("Openings schema probe failed, assuming column missing:", error.message);
+    return false;
+  }
+}
 const { createNotification } = require("../utils/createNotification");
 const {
   onRecruiterPostedJob,
@@ -97,6 +113,22 @@ exports.getRecruiterDashboardSummary = async (req, res) => {
     });
   }
 };
+
+exports.getRecruiterSchemaHealth = async (req, res) => {
+  try {
+    const hasOpeningsColumn = await jobsTableHasOpeningsColumn();
+    return res.status(200).json({
+      jobsOpeningsColumn: hasOpeningsColumn,
+      message: hasOpeningsColumn
+        ? "jobs.openings column is available"
+        : "jobs.openings column is missing. Run DB migration.",
+    });
+  } catch (error) {
+    logger.error("Schema health check failed:", error);
+    return res.status(500).json({ message: "Failed to check schema health" });
+  }
+};
+
 // Recruiter profile (legacy — routes use getRecruiterProfile / async updateProfile)
 exports.getProfile = async (req, res) => {
   try {
@@ -189,6 +221,7 @@ exports.getRecruiterJobs = async (req, res) => {
         department,
         location,
         experience,
+        openings,
         description,
         status,
         posted_date
@@ -201,8 +234,57 @@ exports.getRecruiterJobs = async (req, res) => {
 
     res.status(200).json(jobs);
   } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") {
+      return res.status(500).json({
+        message:
+          "Database migration missing: jobs.openings column is required.",
+      });
+    }
     logger.error("Get recruiter jobs error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+exports.getRecruiterJobsTitleSummary = async (req, res) => {
+  try {
+    const recruiterId = req.user.id;
+    const searchRaw = String(req.query?.search || "").trim();
+
+    const where = ["recruiter_id = ?"];
+    const params = [recruiterId];
+
+    if (searchRaw) {
+      where.push("(job_title LIKE ? OR department LIKE ?)");
+      const like = `%${searchRaw}%`;
+      params.push(like, like);
+    }
+
+    const query = `
+      SELECT
+        COALESCE(NULLIF(TRIM(job_title), ''), 'Untitled Job') AS job_title,
+        COUNT(*) AS total_jobs,
+        SUM(
+          CASE
+            WHEN UPPER(COALESCE(status, '')) = 'ACTIVE' THEN COALESCE(openings, 1)
+            ELSE 0
+          END
+        ) AS active_openings
+      FROM jobs
+      WHERE ${where.join(" AND ")}
+      GROUP BY COALESCE(NULLIF(TRIM(job_title), ''), 'Untitled Job')
+      ORDER BY total_jobs DESC, job_title ASC
+    `;
+
+    const [rows] = await db.query(query, params);
+    return res.status(200).json(rows);
+  } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") {
+      return res.status(500).json({
+        message:
+          "Database migration missing: jobs.openings column is required.",
+      });
+    }
+    logger.error("Get recruiter jobs title summary error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 exports.getRecruiterJobById = async (req, res) => {
@@ -232,12 +314,18 @@ exports.createJob = async (req, res) => {
 
     const recruiterId = req.user.id;
 
-    const { job_title, department, location, experience, description, status } = req.body;
+    const { job_title, department, location, experience, description, status, openings } = req.body;
 
     if (!job_title || !department || !location || !experience || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const openingsV = parseOpenings(openings);
+    if (openingsV == null) {
+      return res
+        .status(400)
+        .json({ message: "Openings must be a whole number greater than 0" });
+    }
     const jt = String(job_title).trim();
     const dept = String(department).trim();
     const loc = String(location).trim();
@@ -275,12 +363,13 @@ exports.createJob = async (req, res) => {
         department,
         location,
         experience,
+        openings,
         description,
         recruiter_id,
         posted_date,
         status
       )
-      VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)
     `;
 
     const [result] = await db.query(query, [
@@ -288,10 +377,24 @@ exports.createJob = async (req, res) => {
       dept,
       loc,
       exp,
+      openingsV,
       desc,
       recruiterId,
       jobStatus
     ]);
+
+    const [savedRows] = await db.query(
+      "SELECT openings FROM jobs WHERE id = ? LIMIT 1",
+      [result.insertId]
+    );
+    const openingsSaved = Number(savedRows?.[0]?.openings ?? 0);
+
+    logger.info("Recruiter job created", {
+      jobId: result.insertId,
+      recruiterId,
+      requestedOpenings: openingsV,
+      savedOpenings: openingsSaved,
+    });
 
     await onRecruiterPostedJob({
       recruiterId,
@@ -301,10 +404,17 @@ exports.createJob = async (req, res) => {
 
     res.status(201).json({
       message: "Job created successfully",
-      jobId: result.insertId
+      jobId: result.insertId,
+      openingsSaved,
     });
 
   } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") {
+      return res.status(500).json({
+        message:
+          "Database migration missing: jobs.openings column is required.",
+      });
+    }
     logger.error("Create job error:", error);
     res.status(500).json({
       message: "Server error",
@@ -317,8 +427,14 @@ exports.updateJob = async (req, res) => {
     const recruiterId = req.user.id;
     const jobId = req.params.id;
 
-    const { job_title, department, location, experience, description, status } = req.body;
+    const { job_title, department, location, experience, description, status, openings } = req.body;
 
+    const openingsV = parseOpenings(openings);
+    if (openingsV == null) {
+      return res
+        .status(400)
+        .json({ message: "Openings must be a whole number greater than 0" });
+    }
     const query = `
       UPDATE jobs
       SET
@@ -326,6 +442,7 @@ exports.updateJob = async (req, res) => {
         department = ?,
         location = ?,
         experience = ?,
+        openings = ?,
         description = ?,
         status = ?
       WHERE id = ? AND recruiter_id = ?
@@ -336,6 +453,7 @@ exports.updateJob = async (req, res) => {
       department,
       location,
       experience,
+      openingsV,
       description,
       status,
       jobId,
@@ -357,6 +475,12 @@ exports.updateJob = async (req, res) => {
 
     res.status(200).json({ message: "Job updated successfully" });
   } catch (error) {
+    if (error?.code === "ER_BAD_FIELD_ERROR") {
+      return res.status(500).json({
+        message:
+          "Database migration missing: jobs.openings column is required.",
+      });
+    }
     logger.error("Update job error:", error);
     res.status(500).json({ message: "Server error" });
   }

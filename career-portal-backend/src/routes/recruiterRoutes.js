@@ -42,11 +42,23 @@ router.get(
   roleMiddleware("recruiter"),
   recruiterController.getRecruiterDashboardSummary
 );
+router.get(
+  "/schema-health",
+  verifyToken,
+  roleMiddleware("recruiter"),
+  recruiterController.getRecruiterSchemaHealth
+);
 
 // ===============================
 // Recruiter jobs
 // ===============================
 router.get("/jobs", verifyToken, roleMiddleware("recruiter"), recruiterController.getRecruiterJobs);
+router.get(
+  "/jobs/title-summary",
+  verifyToken,
+  roleMiddleware("recruiter"),
+  recruiterController.getRecruiterJobsTitleSummary
+);
 router.get("/jobs/:id", verifyToken, roleMiddleware("recruiter"), recruiterController.getRecruiterJobById);
 router.post("/jobs", verifyToken, roleMiddleware("recruiter"), recruiterController.createJob);
 router.put("/jobs/:id", verifyToken, roleMiddleware("recruiter"), recruiterController.updateJob);

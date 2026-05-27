@@ -168,41 +168,64 @@
 
 .recruiter-applications-table th:nth-child(2),
 .recruiter-applications-table td:nth-child(2) {
-  width: 220px;
+  width: 200px;
 }
 
 .recruiter-applications-table th:nth-child(3),
 .recruiter-applications-table td:nth-child(3) {
-  width: 180px;
+  width: 120px;
 }
 
 .recruiter-applications-table th:nth-child(4),
 .recruiter-applications-table td:nth-child(4) {
-  width: 150px;
+  width: 180px;
 }
 
 .recruiter-applications-table th:nth-child(5),
 .recruiter-applications-table td:nth-child(5) {
-  width: 360px;
+  width: 150px;
 }
+
 .recruiter-applications-table th:nth-child(6),
 .recruiter-applications-table td:nth-child(6) {
-  width: 140px;
-}
-
-.recruiter-applications-table th:nth-child(7),
-.recruiter-applications-table td:nth-child(7) {
-  width: 120px;
-}
-
-.recruiter-applications-table th:nth-child(8),
-.recruiter-applications-table td:nth-child(8) {
-  width: 320px;
+  width: 260px;
 }
 
 .applicant-name-cell {
   font-weight: 700;
   color: #0f172a;
+}
+
+.applicant-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.stat-chip-applied {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.stat-chip-pending {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.stat-chip-shortlisted {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.stat-chip-rejected {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .resume-link-btn {

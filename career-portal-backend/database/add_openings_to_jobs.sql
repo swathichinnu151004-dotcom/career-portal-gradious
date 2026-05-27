@@ -1,0 +1,2 @@
+ALTER TABLE jobs
+ADD COLUMN openings INT NOT NULL DEFAULT 1 AFTER experience;

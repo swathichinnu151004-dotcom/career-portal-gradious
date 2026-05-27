@@ -229,6 +229,56 @@ exports.getDashboardSummary = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getJobApplicationStats = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        j.id AS job_id,
+        j.job_title,
+        j.department,
+        COUNT(a.id) AS applied_users,
+        SUM(CASE WHEN LOWER(COALESCE(a.status, '')) = 'shortlisted' THEN 1 ELSE 0 END) AS shortlisted_users,
+        SUM(CASE WHEN LOWER(COALESCE(a.status, '')) = 'rejected' THEN 1 ELSE 0 END) AS rejected_users
+      FROM jobs j
+      LEFT JOIN applications a ON a.job_id = j.id
+      GROUP BY j.id, j.job_title, j.department
+      ORDER BY applied_users DESC, j.job_title ASC
+      LIMIT 50
+    `);
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    logger.error("Job application stats error:", error);
+    return res.status(500).json({ message: "Failed to fetch job application stats" });
+  }
+};
+
+exports.getUserApplicationStats = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        u.id AS user_id,
+        u.name AS user_name,
+        u.email,
+        COUNT(a.id) AS applied_jobs,
+        SUM(CASE WHEN LOWER(COALESCE(a.status, '')) = 'shortlisted' THEN 1 ELSE 0 END) AS shortlisted_jobs,
+        SUM(CASE WHEN LOWER(COALESCE(a.status, '')) = 'rejected' THEN 1 ELSE 0 END) AS rejected_jobs
+      FROM users u
+      LEFT JOIN applications a ON a.user_id = u.id
+      WHERE LOWER(COALESCE(u.role, '')) = 'user'
+      GROUP BY u.id, u.name, u.email
+      HAVING applied_jobs > 0
+      ORDER BY applied_jobs DESC, user_name ASC
+      LIMIT 100
+    `);
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    logger.error("User application stats error:", error);
+    return res.status(500).json({ message: "Failed to fetch user application stats" });
+  }
+};
 // Users
 exports.getAllUsers = async (req, res) => {
   try {

@@ -10,6 +10,7 @@ function PostJob() {
     department: "",
     location: "",
     experience: "",
+    openings: "",
     description: "",
   });
 
@@ -31,11 +32,18 @@ function PostJob() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { jobTitle, department, location, experience, description } = formData;
+    const { jobTitle, department, location, experience, openings, description } = formData;
 
-    if (!jobTitle || !department || !location || !experience || !description) {
+    if (!jobTitle || !department || !location || !experience || !openings || !description) {
       showMessage("Please fill all fields.", "error");
       toast.warning("Please fill all fields.");
+      return;
+    }
+
+    const openingsValue = Number.parseInt(openings, 10);
+    if (!Number.isFinite(openingsValue) || openingsValue < 1) {
+      showMessage("Openings must be a whole number greater than 0.", "error");
+      toast.warning("Openings must be a whole number greater than 0.");
       return;
     }
 
@@ -54,6 +62,7 @@ function PostJob() {
           department,
           location,
           experience,
+          openings: openingsValue,
           description,
         }),
       });
@@ -67,7 +76,11 @@ function PostJob() {
         return;
       }
 
-      const okMsg = data.message || "Job posted successfully";
+      const savedOpenings = Number.parseInt(data?.openingsSaved, 10);
+      const okMsg =
+        Number.isFinite(savedOpenings) && savedOpenings > 0
+          ? `${data.message || "Job posted successfully"} (Openings saved: ${savedOpenings})`
+          : data.message || "Job posted successfully";
       showMessage(okMsg, "success");
       toast.success(okMsg);
 
@@ -76,6 +89,7 @@ function PostJob() {
         department: "",
         location: "",
         experience: "",
+        openings: "",
         description: "",
       });
 
@@ -151,6 +165,21 @@ function PostJob() {
                   value={formData.experience}
                   onChange={handleChange}
                   placeholder="Example: 2+ Years"
+                />
+              </div>
+            </div>
+
+            <div className="form-row single">
+              <div className="form-group">
+                <label>Openings</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  name="openings"
+                  value={formData.openings}
+                  onChange={handleChange}
+                  placeholder="Enter number of openings"
                 />
               </div>
             </div>
