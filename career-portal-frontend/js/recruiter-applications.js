@@ -64,7 +64,7 @@ async function loadRecruiterApplications() {
   const tbody = document.getElementById("applicationsTableBody");
 
   try {
-    const response = await fetch("http://localhost:5000/api/recruiter/applications", {
+    const response = await fetch("${API_BASE_URL}/api/recruiter/applications", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + token
@@ -168,7 +168,7 @@ window.addEventListener("click", function (e) {
 
 async function updateApplicationStatus(applicationId, status) {
   try {
-    const response = await fetch(`http://localhost:5000/api/recruiter/applications/status/${applicationId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/recruiter/applications/status/${applicationId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

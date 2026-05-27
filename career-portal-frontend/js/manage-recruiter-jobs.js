@@ -32,7 +32,7 @@ async function loadRecruiterJobs() {
   const tbody = document.getElementById("jobsTableBody");
 
   try {
-    const response = await fetch("http://localhost:5000/api/recruiter/jobs", {
+    const response = await fetch("${API_BASE_URL}/api/recruiter/jobs", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + token
@@ -183,7 +183,7 @@ document.getElementById("updateJobForm").addEventListener("submit", async functi
   };
 
   try {
-    const response = await fetch(`http://localhost:5000/api/recruiter/jobs/${jobId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/recruiter/jobs/${jobId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -224,7 +224,7 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async func
   if (!deleteJobId) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/api/recruiter/jobs/${deleteJobId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/recruiter/jobs/${deleteJobId}`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + token

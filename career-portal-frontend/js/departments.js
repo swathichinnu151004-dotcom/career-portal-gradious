@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", loadDepartments);
 
 async function loadDepartments() {
   try {
-    const res = await fetch("http://localhost:5000/api/jobs/department-counts");
+    const res = await fetch("${API_BASE_URL}/api/jobs/department-counts");
     const data = await res.json();
 
     const container = document.getElementById("deptGrid");

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "${API_BASE_URL}/api";
 const token = localStorage.getItem("token");
 
 if (!token) {
@@ -40,7 +40,7 @@ function loadUserInfo() {
 }
 async function loadNotificationCount() {
   try {
-    const response = await fetch("http://localhost:5000/api/notifications/count", {
+    const response = await fetch("${API_BASE_URL}/api/notifications/count", {
       headers: {
         Authorization: "Bearer " + token
       }

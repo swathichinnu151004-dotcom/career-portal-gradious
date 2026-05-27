@@ -49,7 +49,7 @@ async function submitJob(event) {
   `;
 
   try {
-    const response = await fetch("http://localhost:5000/api/recruiter/jobs", {
+    const response = await fetch("${API_BASE_URL}/api/recruiter/jobs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -46,7 +46,7 @@ export function getApiBaseUrl() {
   }
 
   if (typeof window === "undefined" || !window.location) {
-    return "http://localhost:5000/api";
+    return "${API_BASE_URL}/api";
   }
 
   const { protocol, hostname, port } = window.location;

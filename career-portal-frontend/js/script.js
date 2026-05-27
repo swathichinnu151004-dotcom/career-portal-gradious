@@ -6,7 +6,7 @@ let jobsExpanded = false;
 // ===============================
 async function loadJobs() {
     try {
-        const response = await fetch("http://localhost:5000/api/admin/latest-jobs");
+        const response = await fetch("${API_BASE_URL}/api/admin/latest-jobs");
         const jobs = await response.json();
 
         allJobsData = Array.isArray(jobs) ? jobs : [];

@@ -3,7 +3,7 @@ const jobId = params.get("id");
 
 async function loadJobDetails() {
   try {
-    const response = await fetch(`http://localhost:5000/api/jobs/public-job/${jobId}`);
+    const response = await fetch(`${API_BASE_URL}/api/jobs/public-job/${jobId}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch job details");
@@ -58,7 +58,7 @@ async function applyJob() {
   const token = localStorage.getItem("token");
 
   try {
-    const response = await fetch("http://localhost:5000/api/jobs/apply", {
+    const response = await fetch("${API_BASE_URL}/api/jobs/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +93,7 @@ async function loadMyApplications() {
   const tbody = document.getElementById("applicationsTableBody");
 
   try {
-    const response = await fetch("http://localhost:5000/api/jobs/my-applications", {
+    const response = await fetch("${API_BASE_URL}/api/jobs/my-applications", {
       method: "GET",
       headers: {
         "Authorization": "Bearer " + token
@@ -149,7 +149,7 @@ async function checkIfAlreadyApplied() {
   if (!token || !applyBtn) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/api/jobs/check-application/${jobId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/jobs/check-application/${jobId}`, {
       headers: {
         "Authorization": "Bearer " + token
       }

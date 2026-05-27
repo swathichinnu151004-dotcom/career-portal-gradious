@@ -18,7 +18,7 @@ let applicationsStatusChart;
 
 async function loadRecruiterSummary() {
     try {
-        const response = await fetch("http://localhost:5000/api/recruiter/dashboard-summary", {
+        const response = await fetch("${API_BASE_URL}/api/recruiter/dashboard-summary", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -198,7 +198,7 @@ function renderApplicationsStatusChart(data) {
 
 async function loadRecentJobs() {
     try {
-        const response = await fetch("http://localhost:5000/api/recruiter/jobs", {
+        const response = await fetch("${API_BASE_URL}/api/recruiter/jobs", {
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -249,7 +249,7 @@ async function loadRecentJobs() {
 
 async function loadRecentApplications() {
     try {
-        const response = await fetch("http://localhost:5000/api/recruiter/applications", {
+        const response = await fetch("${API_BASE_URL}/api/recruiter/applications", {
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token

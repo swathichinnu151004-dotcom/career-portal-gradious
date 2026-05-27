@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-Opens at [http://localhost:3000](http://localhost:3000). Ensure the backend is running (default API: [http://localhost:5000](http://localhost:5000)).
+Opens at [http://localhost:3000](http://localhost:3000). Ensure the backend is running (default API: [${API_BASE_URL}](${API_BASE_URL})).
 
 ## Build
 

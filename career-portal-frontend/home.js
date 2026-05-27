@@ -32,7 +32,7 @@ function renderJobs(jobs) {
 // load latest jobs
 async function loadJobs() {
   try {
-    const response = await fetch("http://localhost:5000/api/jobs/public-latest-jobs");
+    const response = await fetch("${API_BASE_URL}/api/jobs/public-latest-jobs");
 
     if (!response.ok) {
       throw new Error("Failed to fetch jobs");
@@ -70,7 +70,7 @@ async function searchJobs() {
 
   try {
     const response = await fetch(
-      `http://localhost:5000/api/jobs/search?skill=${encodeURIComponent(skill)}&location=${encodeURIComponent(location)}`
+      `${API_BASE_URL}/api/jobs/search?skill=${encodeURIComponent(skill)}&location=${encodeURIComponent(location)}`
     );
 
     if (!response.ok) {
