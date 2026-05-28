@@ -7,5 +7,5 @@ export function getApiBaseUrl() {
   if (fromEnv && String(fromEnv).trim() !== "") {
     return String(fromEnv).trim().replace(/\/$/, "");
   }
-  return "http://localhost:5000/api";
+  return "https://career-portal-backend-live.onrender.com";
 }
