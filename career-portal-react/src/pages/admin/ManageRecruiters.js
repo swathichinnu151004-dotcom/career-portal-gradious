@@ -30,7 +30,7 @@ function ManageRecruiters() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${getApiBaseUrl()}/admin/recruiters`, {
+      const res = await fetch(`${getApiBaseUrl}/admin/recruiters`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -90,7 +90,7 @@ function ManageRecruiters() {
   const updateStatus = async (id, status) => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/admin/recruiters/status/${id}`,
+        `${getApiBaseUrl}/admin/recruiters/status/${id}`,
         {
           method: "PUT",
           headers: {
@@ -130,7 +130,7 @@ function ManageRecruiters() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/admin/recruiters/${deleteId}`,
+        `${getApiBaseUrl}/admin/recruiters/${deleteId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

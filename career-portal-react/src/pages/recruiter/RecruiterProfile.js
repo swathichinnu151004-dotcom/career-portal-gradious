@@ -21,7 +21,7 @@ function RecruiterProfile() {
       const authToken = localStorage.getItem("token");
       if (!authToken) return;
 
-      const res = await fetch(`${getApiBaseUrl()}/recruiter/profile`, {
+      const res = await fetch(`${getApiBaseUrl}/recruiter/profile`, {
         signal,
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -112,7 +112,7 @@ function RecruiterProfile() {
         location: formData.location?.trim() || "",
       };
 
-      const res = await fetch(`${getApiBaseUrl()}/recruiter/profile`, {
+      const res = await fetch(`${getApiBaseUrl}/recruiter/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

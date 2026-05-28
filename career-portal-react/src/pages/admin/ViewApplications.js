@@ -20,7 +20,7 @@ function Applications() {
 
   const loadApplications = useCallback(async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/admin/applications`, {
+      const res = await fetch(`${getApiBaseUrl}/admin/applications`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ function Applications() {
   const updateStatus = async (id, status) => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/admin/applications/status/${id}`,
+        `${getApiBaseUrl}/admin/applications/status/${id}`,
         {
           method: "PUT",
           headers: {

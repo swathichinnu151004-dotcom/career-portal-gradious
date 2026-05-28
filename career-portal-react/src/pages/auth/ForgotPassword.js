@@ -13,7 +13,7 @@ function ForgotPassword() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/auth/forgot-password`, {
+      const res = await fetch(`${getApiBaseUrl}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

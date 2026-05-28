@@ -34,7 +34,7 @@ function UserProfile() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${getApiBaseUrl()}/user/profile`, {
+      const res = await fetch(`${getApiBaseUrl}/user/profile`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ function UserProfile() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/user/profile`, {
+      const res = await fetch(`${getApiBaseUrl}/user/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

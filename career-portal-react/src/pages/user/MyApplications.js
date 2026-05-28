@@ -19,7 +19,7 @@ function MyApplications() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${getApiBaseUrl()}/jobs/my-applications`, {
+      const res = await fetch(`${getApiBaseUrl}/jobs/my-applications`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

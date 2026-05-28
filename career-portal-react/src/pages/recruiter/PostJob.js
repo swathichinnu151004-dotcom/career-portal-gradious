@@ -51,7 +51,7 @@ function PostJob() {
     showMessage("");
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/recruiter/jobs`, {
+      const res = await fetch(`${getApiBaseUrl}/recruiter/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

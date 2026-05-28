@@ -167,7 +167,7 @@ function RecruiterDashboard() {
   const loadSummary = useCallback(async () => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/recruiter/dashboard-summary`,
+        `${getApiBaseUrl}/recruiter/dashboard-summary`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -204,7 +204,7 @@ function RecruiterDashboard() {
 
   const loadJobs = useCallback(async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/recruiter/jobs`, {
+      const res = await fetch(`${getApiBaseUrl}/recruiter/jobs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -227,7 +227,7 @@ function RecruiterDashboard() {
   const loadApplications = useCallback(async () => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/recruiter/applications`,
+        `${getApiBaseUrl}/recruiter/applications`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

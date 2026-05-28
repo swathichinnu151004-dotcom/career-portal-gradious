@@ -5,7 +5,7 @@ import "./Register.css";
 import registerBg from "../../assets/register.jpg";
 import { getApiBaseUrl } from "../../utils/getApiBaseUrl";
 
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = getApiBaseUrl;
 
 function Register() {
   const navigate = useNavigate();

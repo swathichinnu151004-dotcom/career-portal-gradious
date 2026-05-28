@@ -37,7 +37,7 @@ function ManageJobs() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${getApiBaseUrl()}/admin/jobs`, {
+      const res = await fetch(`${getApiBaseUrl}/admin/jobs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -110,7 +110,7 @@ function ManageJobs() {
   const confirmUpdate = async () => {
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/admin/jobs/status/${updateId}`,
+        `${getApiBaseUrl}/admin/jobs/status/${updateId}`,
         {
           method: "PUT",
           headers: {
@@ -150,7 +150,7 @@ function ManageJobs() {
     deleteTimer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `${getApiBaseUrl()}/admin/jobs/${deleteId}`,
+          `${getApiBaseUrl}/admin/jobs/${deleteId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },

@@ -30,7 +30,7 @@ function JobDetails() {
       setLoading(true);
 
       const response = await fetch(
-        `${getApiBaseUrl()}/jobs/public-job/${jobId}`
+        `${getApiBaseUrl}/jobs/public-job/${jobId}`
       );
 
       if (!response.ok) {
@@ -53,7 +53,7 @@ function JobDetails() {
 
     try {
       const response = await fetch(
-        `${getApiBaseUrl()}/jobs/check-application/${jobId}`,
+        `${getApiBaseUrl}/jobs/check-application/${jobId}`,
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -100,7 +100,7 @@ function JobDetails() {
       // change to job_id if your backend expects job_id
       formData.append("jobId", jobId);
 
-      const response = await fetch(`${getApiBaseUrl()}/jobs/apply`, {
+      const response = await fetch(`${getApiBaseUrl}/jobs/apply`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,

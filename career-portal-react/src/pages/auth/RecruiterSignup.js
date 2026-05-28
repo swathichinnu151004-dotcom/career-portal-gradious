@@ -25,7 +25,7 @@ function RecruiterSignup() {
   const [formDisabled, setFormDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL = getApiBaseUrl();
+  const API_BASE_URL = getApiBaseUrl;
 
   useEffect(() => {
     const loadInvite = async () => {

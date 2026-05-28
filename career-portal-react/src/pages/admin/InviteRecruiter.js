@@ -6,7 +6,7 @@ import AppPortalToast from "../../components/common/AppPortalToast";
 import { getApiBaseUrl } from "../../utils/getApiBaseUrl";
 import "./inviteRecruiter.css";
 
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = getApiBaseUrl;
 const ROWS_PER_PAGE = 5;
 
 function InviteRecruiter() {

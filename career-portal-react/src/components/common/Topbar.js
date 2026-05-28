@@ -14,7 +14,7 @@ function Topbar({ title, subtitle, role }) {
 
         let endpoint = "";
 
-        const base = getApiBaseUrl();
+        const base = getApiBaseUrl;
         if (role === "admin") {
           endpoint = `${base}/admin/profile`;
         } else if (role === "recruiter") {

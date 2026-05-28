@@ -40,7 +40,7 @@ function ManageRecruiterJobs() {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const res = await fetch(`${getApiBaseUrl()}/recruiter/jobs`, {
+        const res = await fetch(`${getApiBaseUrl}/recruiter/jobs`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +77,7 @@ function ManageRecruiterJobs() {
 
   const reloadJobs = async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/recruiter/jobs`, {
+      const res = await fetch(`${getApiBaseUrl}/recruiter/jobs`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -172,8 +172,8 @@ function ManageRecruiterJobs() {
       try {
         const q = String(searchTerm || "").trim();
         const url = q
-          ? `${getApiBaseUrl()}/recruiter/jobs/title-summary?search=${encodeURIComponent(q)}`
-          : `${getApiBaseUrl()}/recruiter/jobs/title-summary`;
+          ? `${getApiBaseUrl}/recruiter/jobs/title-summary?search=${encodeURIComponent(q)}`
+          : `${getApiBaseUrl}/recruiter/jobs/title-summary`;
 
         const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
@@ -221,7 +221,7 @@ function ManageRecruiterJobs() {
       };
 
       const res = await fetch(
-        `${getApiBaseUrl()}/recruiter/jobs/${updateJob.id}`,
+        `${getApiBaseUrl}/recruiter/jobs/${updateJob.id}`,
         {
           method: "PUT",
           headers: {
@@ -253,7 +253,7 @@ function ManageRecruiterJobs() {
 
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/recruiter/jobs/${deleteJobId}`,
+        `${getApiBaseUrl}/recruiter/jobs/${deleteJobId}`,
         {
           method: "DELETE",
           headers: {

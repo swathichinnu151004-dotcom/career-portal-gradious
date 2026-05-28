@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getApiBaseUrl } from "../../utils/getApiBaseUrl";
 
-export const AUTH_API_BASE = getApiBaseUrl();
+export const AUTH_API_BASE = getApiBaseUrl;
 
 export function normalizeGoogleWebClientId(value) {
   let s = String(value || "").trim();

@@ -21,7 +21,7 @@ function UserDashboard() {
 
   const loadDashboard = useCallback(async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/user/dashboard-summary`, {
+      const res = await fetch(`${getApiBaseUrl}/user/dashboard-summary`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +52,7 @@ function UserDashboard() {
 
   const loadLatestJobs = useCallback(async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/jobs/latest-jobs`, {
+      const res = await fetch(`${getApiBaseUrl}/jobs/latest-jobs`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

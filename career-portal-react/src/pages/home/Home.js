@@ -21,7 +21,7 @@ function Home() {
 
   const loadJobs = async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/jobs/public-latest-jobs`);
+      const res = await fetch(`${getApiBaseUrl}/jobs/public-latest-jobs`);
 
       if (!res.ok) {
         throw new Error("Failed to fetch jobs");
@@ -39,7 +39,7 @@ function Home() {
 
   const loadDepartments = async () => {
     try {
-      const res = await fetch(`${getApiBaseUrl()}/jobs/department-counts`);
+      const res = await fetch(`${getApiBaseUrl}/jobs/department-counts`);
 
       if (!res.ok) {
         throw new Error("Failed to fetch departments");
@@ -66,7 +66,7 @@ function Home() {
 
     try {
       const res = await fetch(
-        `${getApiBaseUrl()}/jobs/search?skill=${encodeURIComponent(
+        `${getApiBaseUrl}/jobs/search?skill=${encodeURIComponent(
           skill
         )}&location=${encodeURIComponent(location)}`
       );
