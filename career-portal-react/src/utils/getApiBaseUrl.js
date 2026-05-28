@@ -1,4 +1,4 @@
 export function getApiBaseUrl() {
-  // Direct path to your active Render cloud server
+  // Directly point to your active Render live backend
   return "https://gradious-career-portal-project-backend.onrender.com/api";
 }
