@@ -27,45 +27,45 @@ function RecruiterSignup() {
 
   const API_BASE_URL = getApiBaseUrl();
 
-  useEffect(() => {
-    const loadInvite = async () => {
-      clearMessage();
+ useEffect(() => {
+  const loadInvite = async () => {
+    clearMessage();
 
-      if (!token) {
-        showMessage("Invalid signup link. Token is missing.", "error");
+    if (!token) {
+      showMessage("Invalid signup link. Token is missing.", "error");
+      setFormDisabled(true);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/auth/validate-invite?token=${encodeURIComponent(token)}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const msg = data.message || "Invalid or expired invite link.";
+        showMessage(msg, "error");
+        toast.error(msg);
         setFormDisabled(true);
         return;
       }
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/auth/validate-invite?token=${encodeURIComponent(token)}`
-        );
+      setFormData((prev) => ({
+        ...prev,
+        email: data.email || "",
+      }));
+    } catch (error) {
+      console.error("Validate invite error:", error);
+      showMessage("Server error while validating invite link.", "error");
+      toast.error("Server error while validating invite link.");
+      setFormDisabled(true);
+    }
+  };
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          const msg = data.message || "Invalid or expired invite link.";
-          showMessage(msg, "error");
-          toast.error(msg);
-          setFormDisabled(true);
-          return;
-        }
-
-        setFormData((prev) => ({
-          ...prev,
-          email: data.email || "",
-        }));
-      } catch (error) {
-        console.error("Validate invite error:", error);
-        showMessage("Server error while validating invite link.", "error");
-        toast.error("Server error while validating invite link.");
-        setFormDisabled(true);
-      }
-    };
-
-    loadInvite();
-  }, [token]);
+  loadInvite();
+}, [token, API_BASE_URL]);
 
   const handleChange = (e) => {
     setFormData({
