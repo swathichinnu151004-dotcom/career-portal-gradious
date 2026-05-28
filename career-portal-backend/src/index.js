@@ -70,32 +70,6 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-const staticCandidates = [
-  process.env.STATIC_PATH && String(process.env.STATIC_PATH).trim(),
-  path.join(__dirname, "../../career-portal-react/build"),
-  path.join(__dirname, "../../career-portal-frontend"),
-].filter(Boolean);
-
-const staticRoot = staticCandidates.find((dir) => fs.existsSync(dir));
-
-if (staticRoot) {
-  logger.info(`Serving static UI from ${staticRoot}`);
-  app.use(express.static(staticRoot));
-  // Express 5 / path-to-regexp v8+ rejects app.get("*", …). SPA fallback without a "*" route pattern.
-  app.use((req, res, next) => {
-    if (req.method !== "GET" && req.method !== "HEAD") return next();
-    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
-      return next();
-    }
-    res.sendFile(path.join(staticRoot, "index.html"), (err) => {
-      if (err) next(err);
-    });
-  });
-} else {
-  logger.warn(
-    "No static UI directory found (set STATIC_PATH or run `npm run build` in career-portal-react). API-only mode."
-  );
-}
 
 const PORT = Number(process.env.PORT) || 5000;
 /** Listen on all interfaces so phones and other devices on the LAN can reach the API. */
