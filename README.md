@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🚀 Gradious Career Portal
 
 ## 📌 Project Overview
