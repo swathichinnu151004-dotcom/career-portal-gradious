@@ -171,9 +171,6 @@ npm install
 npm start
 ```
 
-<<<<<<< HEAD
----
-
 ## ⚙️ Environment Setup
 
 Create a `.env` file in backend folder and add:
