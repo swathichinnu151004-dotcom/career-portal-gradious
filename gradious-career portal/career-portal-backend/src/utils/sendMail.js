@@ -14,12 +14,19 @@ function getTransporter() {
   }
 
   if (!cachedTransporter) {
-    cachedTransporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user, pass },
-    });
+    const host = process.env.EMAIL_HOST || "smtp.gmail.com";
+const port = Number(process.env.EMAIL_PORT || 587);
+const secure = String(process.env.EMAIL_SECURE || "false") === "true";
+
+cachedTransporter = nodemailer.createTransport({
+  host,
+  port,
+  secure,
+  auth: { user, pass },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+});
   }
 
   return cachedTransporter;
@@ -59,7 +66,7 @@ const sendMail = async ({ to, subject, text, html, from }) => {
 sendMail.verifySmtpConfig = async function verifySmtpConfig() {
   try {
     await getTransporter().verify();
-    logger.info("SMTP verify OK (smtp.gmail.com:465)");
+    logger.info(`SMTP verify OK (${process.env.EMAIL_HOST || "smtp.gmail.com"}:${process.env.EMAIL_PORT || 587})`);
   } catch (e) {
     logger.error(
       "SMTP verify failed — outbound email disabled until credentials are fixed:",
