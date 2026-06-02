@@ -119,20 +119,18 @@ exports.applyJob = async (req, res) => {
         userId,
       });
     } else {
-      try {
-        await sendJobApplicationConfirmationEmail({
-          to: applicantEmail,
-          applicantName,
-          job: jobRows[0],
-          applicationId,
-        });
-        emailStatus = "sent";
-        logger.info("[applyJob] Confirmation email sent", { applicationId });
-      } catch (err) {
-        emailStatus = "failed";
-        emailError = err?.message || String(err);
-        logger.error("[applyJob] Confirmation email failed:", emailError);
-      }
+     sendJobApplicationConfirmationEmail({
+  to: applicantEmail,
+  applicantName,
+  job: jobRows[0],
+  applicationId,
+})
+  .then(() => logger.info("[applyJob] Confirmation email sent", { applicationId }))
+  .catch((err) =>
+    logger.error("[applyJob] Confirmation email failed:", err?.message || String(err))
+  );
+
+emailStatus = "queued";
     }
 
     return res.status(201).json({
