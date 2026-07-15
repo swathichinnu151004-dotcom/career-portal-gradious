@@ -10,6 +10,9 @@ const { ensureJobsOpeningsColumn } = require("./utils/ensureJobsOpeningsColumn")
 const db = require("./config/connectDB");
 
 const app = express();
+app.get("/", (req, res) => {
+  res.send("Gradious Career Portal Backend is running!");
+});
 
 /** Behind nginx, Railway, Render, etc. — set TRUST_PROXY=1 so req IP / secure cookies behave. */
 if (String(process.env.TRUST_PROXY || "").trim() === "1") {
