@@ -29,6 +29,11 @@ const db = mysql.createPool({
   user: process.env.DB_USER || "root",
   password: dbPassword,
   database: process.env.DB_NAME || "gradious_portal",
+
+  ssl: {
+    rejectUnauthorized: false,
+  },
+
   waitForConnections: true,
   connectionLimit: poolLimit,
   queueLimit: 0,

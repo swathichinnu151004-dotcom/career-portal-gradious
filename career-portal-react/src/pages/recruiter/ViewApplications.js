@@ -15,12 +15,12 @@ import {
   getRecruiterApplications,
   updateApplicationStatus,
 } from "../../services/recruiterService";
-import { getServerOrigin } from "../../utils/getApiBaseUrl";
+import { getApiBaseUrl } from "../../utils/getApiBaseUrl";
 
 function resumeFileUrl(resume) {
   if (!resume) return "#";
   const path = String(resume).replace(/^\//, "");
-  return `${getServerOrigin()}/${path}`;
+  return getApiBaseUrl + "/" + path;
 }
 
 function applicantKey(app) {
