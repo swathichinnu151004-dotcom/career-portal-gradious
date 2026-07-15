@@ -11,9 +11,8 @@ const db = require("./config/connectDB");
 
 const app = express();
 app.get("/", (req, res) => {
-  res.send("Gradious Career Portal Backend is running!");
+  res.status(200).send("RENDER BACKEND TEST SUCCESS");
 });
-
 /** Behind nginx, Railway, Render, etc. — set TRUST_PROXY=1 so req IP / secure cookies behave. */
 if (String(process.env.TRUST_PROXY || "").trim() === "1") {
   app.set("trust proxy", 1);
