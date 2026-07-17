@@ -15,12 +15,12 @@ function getTransporter() {
 
   if (!cachedTransporter) {
     cachedTransporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-port: 587,
-secure: false,
-requireTLS: true,
-      auth: { user, pass },
-    });
+  service: "gmail",
+  auth: {
+    user,
+    pass,
+  },
+});
   }
 
   return cachedTransporter;

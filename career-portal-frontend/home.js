@@ -32,7 +32,7 @@ function renderJobs(jobs) {
 // load latest jobs
 async function loadJobs() {
   try {
-    const response = await fetch("${API_BASE_URL}/api/jobs/public-latest-jobs");
+    const response = await fetch(`${API_BASE_URL}/api/jobs/public-latest-jobs`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch jobs");
