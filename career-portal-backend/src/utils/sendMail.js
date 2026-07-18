@@ -19,12 +19,19 @@ function getTransporter() {
       console.log("SMTP DNS:", addresses);
     });
 
-   cachedTransporter = nodemailer.createTransport({
-  service: "gmail",
+ cachedTransporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user,
     pass,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+  logger: true,
+  debug: true,
 });
   }
 
@@ -65,14 +72,9 @@ const sendMail = async ({ to, subject, text, html, from }) => {
 sendMail.verifySmtpConfig = async function verifySmtpConfig() {
   try {
     await getTransporter().verify();
-    logger.info(
-  `SMTP verify OK (${process.env.EMAIL_HOST}:${process.env.EMAIL_PORT})`
-);
+    console.log("✅ SMTP Verify Success");
   } catch (e) {
-    logger.error(
-      "SMTP verify failed — outbound email disabled until credentials are fixed:",
-      e.message
-    );
+    console.error("❌ SMTP VERIFY ERROR:", e);
   }
 };
 
