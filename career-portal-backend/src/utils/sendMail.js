@@ -14,6 +14,10 @@ function getTransporter() {
   }
 
   if (!cachedTransporter) {
+    dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
+      console.log("SMTP DNS:", addresses);
+    });
+
     cachedTransporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || "smtp.gmail.com",
   port: Number(process.env.EMAIL_PORT) || 587,
