@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const logger = require("./logger");
+const dns = require("dns");
 
 let cachedTransporter = null;
 
