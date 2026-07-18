@@ -20,9 +20,7 @@ function getTransporter() {
     });
 
    cachedTransporter = nodemailer.createTransport({
-  host: "172.253.132.108", // Gmail SMTP IPv4
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user,
     pass,
